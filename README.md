@@ -1,10 +1,12 @@
-# sql-analytics-case-study
+# From Excel-Based Analysis to a Reproducible SQL Analytics Model
 
-## From Excel-Based Analysis to a Reproducible SQL Analytics Model
+This repository presents a case study focused on designing an analytics-ready SQL data model starting from spreadsheet-based operational data.
 
-### Context & Problem
+---
 
-In the company, critical production data, including process parameters, operational measurements, and quality control results, was manually captured using Excel files/Google Sheets.
+## Context & Problem
+
+In a company, critical production data, including process parameters, operational measurements, and quality control results, was manually captured using Excel files/Google Sheets.
 
 Each production process generated its own spreadsheets, which were later used for different types of analysis:
 
@@ -16,7 +18,7 @@ Each production process generated its own spreadsheets, which were later used fo
 
 Over time, this approach became increasingly fragile and inefficient.
 
-The main issues were:
+**The main issues were:**
 
 - Approximately **10 different spreadsheet workbooks**, with more than 20 active sheets capturing data
 - Data entered without strict validation, leading to inconsistencies and duplication
@@ -98,7 +100,7 @@ This approach eliminated the need for downstream data corrections in spreadsheet
 
 Data ingestion was handled using Python and pandas to read spreadsheets files, standardize formats, and export staging-ready CSV files.
 
-The ingestion flow followed these steps:
+**The ingestion flow followed these steps:**
 
 1. Read Excel/Sheets using Python (pandas)
 2. Standardize formats (dates, times, column names, data types)
@@ -110,7 +112,7 @@ This design decoupled data extraction from transformation logic, keeping the dat
 
 ## SQL as the Core Transformation Layer
 
-All core transformations were implemented in SQL, allowing:
+**All core transformations were implemented in SQL, allowing:**
 
 - Standardized business logic
 - Reusable transformation patterns
@@ -120,13 +122,13 @@ By enforcing transformations at the database level, analytical outputs became co
 
 ## Python for Analytical Consumption
 
-Once analytical tables and views were available, Python and pandas were used to:
+**Once analytical tables and views were available, Python and pandas were used to:**
 
 - Consume curated datasets
 - Build reproducible analysis notebooks
 - Apply domain-specific transformations on demand
 
-A typical analytical use case involved generating consolidated, heat level datasets combining:
+**A typical analytical use case involved generating consolidated, heat level datasets combining:**
 
 - chemical composition results
 - rolling temperatures
@@ -136,7 +138,7 @@ These datasets enabled more advanced exploratory and statistical analyses in lat
 
 ## Results & Impact
 
-The implementation delivered clear and measurable benefits:
+**The implementation delivered clear and measurable benefits:**
 
 - Significant efficiency gains by removing dependency on multiple spreadsheet versions
 - Higher data reliability through enforced constraints at ingestion
@@ -149,7 +151,7 @@ when data could be ingested without errors and consumed at any time, the system 
 
 ## Value for the Analyst
 
-From an analytical perspective, the model provides:
+**From an analytical perspective, the model provides:**
 
 - Fluency: less time preparing data, more time analyzing
 - Certainty: a single, trusted version of the data
@@ -159,12 +161,14 @@ The analyst transitions from maintaining spreadsheets to working with a stable a
 
 ## Lessons Learned
 
-The primary lesson from this project is straightforward:
+**The primary lesson from this project is straightforward:**
 
+```
 When a consistent and reproducible data structure is defined upfront,
 all downstream analysis becomes significantly simpler.
+```
 
-Analytical quality depends directly on:
+**Analytical quality depends directly on:**
 
 - data consistency
 - clarity of the data model
@@ -176,15 +180,14 @@ Investing time in data modeling dramatically reduces future complexity.
 
 This project represents a transition from spreadsheet-dependent analysis to a reproducible and scalable SQL-based analytics model.
 
-More than a technical migration, it reflects a shift in mindset:
-treating data as a system rather than a collection of isolated files.
+More than a technical migration, it reflects a shift in mindset:  
+**treating data as a system rather than a collection of isolated files.**
 
 ```mermaid
 flowchart LR
-  A[Excel / Google Sheets] --> B[Python pandas\nExtract and standardize]
-  B --> C[CSV exports\nstaging-ready]
+  A[Excel / Google Sheets] --> B[Python pandas\\nExtract and standardize]
+  B --> C[CSV exports\\nstaging-ready]
   C --> D[(PostgreSQL)]
-  D --> E[Semantic layer\nViews for analysis]
-  E --> F[Python notebooks\nEDA and reporting]
-  E --> F[Python notebooks\nEDA / reporting]
+  D --> E[Semantic layer\\nViews for analysis]
+  E --> F[Python notebooks\\nEDA and reporting]
 ```

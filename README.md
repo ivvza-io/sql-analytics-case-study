@@ -185,9 +185,9 @@ More than a technical migration, it reflects a shift in mindset:
 
 ```mermaid
 flowchart LR
-  A[Excel / Google Sheets] --> B[Python pandas\\nExtract and standardize]
-  B --> C[CSV exports\\nstaging-ready]
+  A[Excel / Google Sheets] --> B[Python pandas<br/>Extract and standardize]
+  B --> C[CSV exports<br/>staging-ready]
   C --> D[(PostgreSQL)]
-  D --> E[Semantic layer\\nViews for analysis]
-  E --> F[Python notebooks\\nEDA and reporting]
+  D --> E[Semantic layer<br/>Views for analysis]
+  E --> F[Python notebooks<br/>EDA and reporting]
 ```

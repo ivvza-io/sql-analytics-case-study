@@ -14,6 +14,9 @@ This repository presents a case study focused on designing an analytics-ready SQ
 **Docs**
 -  Architecture → [`docs/architecture.md`](docs/architecture.md)
 
+**Notebooks**
+- Demo notebook → [`notebooks/01_sql_semantic_layer_consumption.ipynb`](notebooks/01_sql_semantic_layer_consumption.ipynb)
+
 ## Notebook (Analytical Consumption Demo)
 
 This repository includes a minimal notebook that demonstrates how the semantic layer can be consumed from Python (SQLAlchemy + pandas) to build analysis-ready datasets with minimal wrangling.
@@ -226,8 +229,7 @@ flowchart LR
   C --> D[(PostgreSQL)]
   D --> E[Semantic layer<br/>Views for analysis]
   E --> F[Python notebooks<br/>EDA and reporting]
-
-
+```
 ---
 
 ## Status

@@ -1,7 +1,8 @@
 # Architecture Overview
 
-This document describes the high-level architecture of the analytics pipeline implemented in this case study.  
-The focus is on clarity, separation of responsibilities, and reproducibility rather than low-level implementation details.
+This document describes the high-level architecture of the analytics pipeline implemented in this case study.
+
+The focus is on **clarity, separation of responsibilities, and analytical reproducibility**, rather than low-level implementation details or infrastructure optimization.
 
 ---
 
@@ -36,30 +37,54 @@ flowchart TB
 > The Core layer represents stable reference entities (such as lots, machines, and areas).  
 > It is initialized once and evolves infrequently, rather than being part of the recurring ETL cycle.
 
+---
+
+## Architectural Role in Analytical Decision-Making
+
+This architecture is intentionally designed to support decision-oriented analytics, not ad-hoc reporting.
+
+By enforcing:
+- a stable data grain,
+- centralized transformations,
+- and curated semantic views,
+
+the pipeline ensures that:
+- predictive models are trained on consistent definitions,
+- uncertainty estimates remain comparable over time,
+- downstream analytical conclusions can be traced back to source data.
+
+This stability is a prerequisite for the modeling, screening, and uncertainty-aware design tools documented in subsequent study cases.
+
+---
 
 ## Architecture Principles
 
-The architecture was designed around a small set of core principles:
+The architecture is guided by a small set of core principles:
 
-- **Single source of truth**
+**Single source of truth**
 
-    PostgreSQL is the authoritative layer where structure, consistency, and business rules are enforced.
+PostgreSQL is the authoritative layer where structure, consistency, and business rules are enforced.
 
-- **Separation of concerns**
+**Separation of concerns**
 
-    Extraction, transformation, modeling, and consumption are handled in distinct stages to reduce coupling.
+Extraction, transformation, modeling, and consumption are handled in distinct stages to reduce coupling and prevent analytical logic from leaking across layers.
 
-- **SQL-first transformations**
+**SQL-first transformations**
 
-    Core transformations and validations are implemented in SQL to ensure consistent analytical logic.
+Core transformations and validations are implemented in SQL, ensuring:
+- centralized business logic,
+- reusable transformation patterns,
+- consistent analytical semantics.
 
-- **Analytics-ready design**
+**Analytics-ready design**
 
-    A semantic layer exposes curated views optimized for analytical consumption.
+A semantic layer exposes curated views optimized for analytical consumption, rather than raw operational data.
 
-- **Reproducibility over convenience**
+**Reproducibility over convenience**
 
-    The pipeline prioritizes repeatable, deterministic results over ad-hoc manual workflows.
+The pipeline prioritizes repeatable, deterministic results over manual or ad-hoc workflows.
+
+---
 
 ## Data Flow
 
@@ -103,12 +128,29 @@ Analytical views and tables are built to reflect common analytical questions, ex
 
 Python notebooks consume the semantic layer to perform analysis, aggregation, and reporting.
 
+---
+
 ## Why This Architecture Works
 
-New data can be added without breaking existing analyses
+- New data can be added without breaking existing analyses
+- Analytical logic is centralized and versionable
+- Model inputs remain stable across time and systems
+- Analysts reason over curated semantics instead of raw operational noise
 
-- Analytical logic is centralized and reusable
-- The model can evolve as processes and analytical needs change
-- Analysts interact with curated datasets instead of raw operational data
+This stability is critical when analytics are used to support engineering decisions, where inconsistent definitions can lead to incorrect conclusions and increased operational risk.
 
-This structure supports both day-to-day analysis and long-term analytical growth.
+---
+
+## Summary
+
+This architecture is not intended to be a full data platform.
+
+It is a disciplined analytical backbone designed to:
+
+- replace fragile spreadsheet-based workflows,
+- enforce semantic consistency,
+- and enable reliable modeling and decision-support analytics.
+
+Its value lies not in technical novelty, but in providing the stability required for uncertainty-aware, engineering-driven analytical work.
+
+---

@@ -1,6 +1,6 @@
 # From Excel-Based Analysis to a Reproducible SQL Analytics Model
 
-This repository presents a case study focused on designing an analytics-ready SQL data model starting from spreadsheet-based operational and quality data.
+Designing a reusable, analytics-ready semantic layer to replace spreadsheet-based workflows and support downstream modeling and engineering decision-making.
 
 ---
 
@@ -9,232 +9,194 @@ This repository presents a case study focused on designing an analytics-ready SQ
 - **Domain:** Production, process, and quality data  
 - **Focus:** Data modeling, SQL-based transformations, analytics readiness  
 - **Stack:** PostgreSQL, SQL, Python (pandas)  
-- **Outcome:** Reproducible, scalable analytics replacing spreadsheet-based workflows  
+- **Outcome:** Reproducible, extensible analytics foundation replacing spreadsheet-based workflows  
 
-**Docs**
--  Architecture → [`docs/architecture.md`](docs/architecture.md)
+**Documentation**
+- Architecture → [`docs/architecture.md`](docs/architecture.md)
 
-**Notebooks**
-- Demo notebook → [`notebooks/01_sql_semantic_layer_consumption.ipynb`](notebooks/01_sql_semantic_layer_consumption.ipynb)
+**Notebook**
+- Semantic layer consumption example → [`notebooks/01_sql_semantic_layer_consumption.ipynb`](notebooks/01_sql_semantic_layer_consumption.ipynb)
 
-## Notebook (Analytical Consumption Demo)
+---
 
-This repository includes a minimal notebook that demonstrates how the semantic layer can be consumed from Python (SQLAlchemy + pandas) to build analysis-ready datasets with minimal wrangling.
+## Role Within the Portfolio
 
-**Confidentiality note:**  
-The original database and production data used in the real project are not publicly accessible due to confidentiality constraints.  
-The notebook is written against the same semantic view interfaces and demonstrates the real query patterns (joins, pivots, segmentation) used in practice.
+This study case establishes the **analytical foundation** for all modeling and decision-support work documented in this portfolio.
+
+The semantic layer designed here is reused directly in:
+- chemistry-only modeling (Study Case 2),
+- cross-system generalization (Study Case 3),
+- variable influence screening (Study Case 4),
+- and uncertainty-aware design tools (Study Case 5).
+
+More broadly, the same foundation supported additional analytical and monitoring workflows in practice.  
+However, this portfolio intentionally focuses on the subset of analyses related to **chemistry-driven modeling and engineering design decisions**, as these best illustrate the analytical reasoning and trade-offs behind the work.
+
+SC1 is therefore not an isolated data engineering exercise, but a **reusable analytical system** designed to support multiple downstream use cases under consistent data semantics.
 
 ---
 
 ## Context & Problem
 
-In the company, critical production data including process parameters, operational measurements, and quality control results was manually captured using Excel files and Google Sheets.
+Critical production, process, and quality data were historically captured using Excel files and Google Sheets.
 
-Each production process generated its own spreadsheets, which were later used for different types of analysis:
+Each production area maintained its own spreadsheets, which were later used for:
+- daily production monitoring,
+- process variable tracking,
+- Statistical Process Control (SPC),
+- traceability analysis,
+- ad-hoc exploratory analysis.
 
-- Daily production monitoring  
-- Process variable tracking  
-- Statistical Process Control (SPC)  
-- Traceability analysis  
-- Ad-hoc exploratory analysis  
+Over time, this approach became increasingly fragile.
 
-Over time, this approach became increasingly fragile and inefficient.
-
-The main issues were:
-
-- Approximately **10 different spreadsheet workbooks**, with more than **20 active sheets** capturing data  
-- Data entered without strict validation, leading to inconsistencies and duplication  
-- Analyses requiring manual merging of multiple files, sheets, and formulas  
-- Growing data volumes causing performance issues and file corruption  
-- Historical analysis becoming slow, error-prone, and unreliable  
+Key issues included:
+- More than **10 active workbooks** with **20+ sheets**
+- Minimal validation at data entry
+- Manual merges across files and formulas
+- Performance degradation and file corruption
+- Limited reproducibility and traceability
 
 At this stage, the problem was no longer purely technical.  
-**The existing workflow was neither scalable nor reproducible.**
+**The workflow itself had become a bottleneck to reliable analysis.**
 
 ---
 
 ## Project Goal
 
-The goal of this project was to design and implement a centralized PostgreSQL database, using SQL as the core transformation layer, in order to:
+The goal of this project was to design and implement a centralized PostgreSQL-based analytics model that would:
 
-- Centralize production data into a single source of truth  
-- Define clear and consistent data structures from ingestion  
-- Support periodic data loads with minimal friction  
-- Enable analytical consumption without reliance on spreadsheets  
-- Make analyses reproducible, extensible, and automatable  
+- Act as a single source of truth
+- Enforce data consistency and validation early
+- Support repeatable analytical consumption
+- Eliminate spreadsheet-dependent workflows
+- Serve as a stable foundation for downstream analytics and modeling
 
-The objective was not simply to store data, but to build a **robust analytical foundation** for current and future use cases.
+The objective was not simply to store data, but to build a **reusable analytical system**.
 
 ---
 
 ## Key Challenges
 
-### 1. Data inconsistency
-Historical data originated from spreadsheets with minimal validation, resulting in duplicated records, mixed formats, and undocumented implicit rules.
+### Data inconsistency
+Historical spreadsheet data contained duplicated records, mixed formats, and undocumented implicit rules.
 
-### 2. Data model design
-The primary challenge was conceptual rather than technical:  
-designing a structure that was:
+### Data model design
+The main challenge was conceptual: designing a structure that was:
+- simple enough for daily use,
+- flexible enough for multiple analytical perspectives,
+- stable enough to evolve over time.
 
-- simple enough for daily use  
-- flexible enough to support multiple analytical perspectives  
-- stable enough to grow over time  
-
-### 3. Workflow transition
-Moving from manual Excel-based analysis to a database-driven model required a shift in how data was consumed and reasoned about.
+### Workflow transition
+Moving from manual Excel-based analysis to a database-centric workflow required a shift in how data was consumed and reasoned about.
 
 ---
 
 ## Approach & Solution
 
+The solution was implemented as a layered analytical architecture that separates ingestion, validation, semantic modeling, and analytical consumption.
+
+The diagram below summarizes the overall data flow and responsibility boundaries:
+
+```mermaid
+flowchart LR
+  A[Excel<br/>Google Sheets] --> B[Python pandas<br/>Extract and standardize]
+  B --> C[CSV exports<br/>staging-ready]
+  C --> D[(PostgreSQL)]
+  D --> E[Semantic layer<br/>Analytics-ready views]
+  E --> F[Python notebooks<br/>Analysis & modeling]
+```
 ### Database as a Single Source of Truth
 
-A PostgreSQL database was designed to act as the system’s single source of truth, where:
+A PostgreSQL database was designed to act as the system’s analytical backbone, where:
+- ingestion occurs under explicit constraints,
+- transformations are centralized,
+- and analytical outputs are consistent and traceable.
 
-- Data is ingested under explicit structural and logical constraints  
-- Data stages are clearly separated (*raw*, *clean*, *semantic*)  
-- Consistency, traceability, and reusability are prioritized  
+### Layered data model
 
-This approach eliminated the need for downstream data corrections in spreadsheets.
+The model is organized into:
+- **raw** — minimally processed, ingestion-oriented tables  
+- **clean** — validated and standardized representations  
+- **semantic** — analytics-ready views optimized for consumption  
+
+This separation prevents downstream correction logic from leaking into analysis.
 
 ---
 
-## Data Modeling Decisions
+## Core Data Modeling Decisions
 
-- **Separation of core entities (heats and machines)**  
-  From the beginning, key entities such as heats and machines were modeled as standalone entities. This made it possible to consistently attach all related process and quality data to a single heat, avoiding fragmented or duplicated representations across datasets.
+- **Explicit heat-level grain**  
+  All analytical outputs are anchored at heat level, enabling consistent joins across chemistry, process, and quality domains.
 
-- **Layered data model (raw, clean, semantic)**  
-  The model was structured into clear layers. The *raw* layer preserves the original structure of spreadsheet data designed for ease of manual input. The *clean* layer standardizes and reshapes this data to make it reliable and integrable. The *semantic* layer exposes analytical views and tables optimized for consumption.
+- **Separation of core entities and process domains**  
+  Stable entities (e.g., heats, machines) are modeled independently from process-specific measurements.
 
 - **Early validation and error prevention**  
-  Data validation is enforced during the transition from *raw* to *clean*. Duplicates, invalid formats, and constraint violations are detected early, preventing inconsistent data from reaching analytical layers.
-
-- **Core vs process separation**  
-  Stable entities (such as machines and production areas) are modeled in the core layer, while process-specific data is isolated in process domains. This allows process parameters to evolve without destabilizing the core model.
+  Duplicates, invalid formats, and constraint violations are detected during raw-to-clean transitions.
 
 - **SQL-first transformation strategy**  
-  All transformations that can be reasonably expressed in SQL are implemented at the database level, centralizing business logic and minimizing repetitive transformations in notebooks.
+  Business logic and structural transformations are implemented in SQL to maximize reuse and transparency.
 
-- **Selective use of pandas for complex reshaping**  
-  Python and pandas are reserved for transformations that are cumbersome in SQL (such as complex pivots or unpivots), keeping structural logic in the database while preserving analytical flexibility.
+- **Selective use of Python**  
+  Pandas is reserved for transformations that are cumbersome in SQL, such as complex reshaping for analysis.
 
 - **Pragmatic scope control**  
-  The model intentionally includes only data required for current analytical use cases, leaving out low-value or rarely used fields to keep the system focused and maintainable.
+  Only data required for current analytical use cases is modeled, avoiding unnecessary complexity.
 
 ---
 
 ## Data Ingestion Strategy
 
-Data ingestion was handled using Python and pandas to read spreadsheet files, standardize formats, and export staging-ready CSV files.
+Data ingestion is handled via Python and pandas:
 
-The ingestion flow followed these steps:
+1. Read Excel / Sheets
+2. Standardize formats and naming
+3. Export staging-ready CSV files
+4. Load into PostgreSQL raw tables
+5. Apply SQL-based validation and transformations
 
-1. Read Excel/Sheets using Python (pandas)  
-2. Standardize formats (dates, times, column names, data types)  
-3. Export staging-ready CSV files  
-4. Load CSVs into PostgreSQL as *staging/raw* tables  
-5. Apply SQL-based transformations and validations into *clean*, *core*, and *semantic* layers  
-
-This design decouples data extraction from transformation logic, keeping the database as the authoritative layer for business rules and validations.
+This decouples extraction from business logic, keeping the database authoritative.
 
 ---
 
-## SQL as the Core Transformation Layer
+## Analytical Consumption
 
-All core transformations were implemented in SQL, allowing:
+Once semantic views are defined, Python is used for analytical consumption:
 
-- Standardized business logic  
-- Reusable transformation patterns  
-- Reduced downstream data wrangling  
+- generation of heat-level analytical datasets,
+- exploratory and statistical analysis,
+- reproducible notebooks consuming stable SQL interfaces.
 
-By enforcing transformations at the database level, analytical outputs became consistent and reproducible.
-
----
-
-## Python for Analytical Consumption
-
-Once analytical tables and views were available, Python and pandas were used to:
-
-- Consume curated datasets  
-- Build reproducible analysis notebooks  
-- Apply domain-specific transformations on demand  
-
-A typical analytical use case involved generating consolidated, **heat-level** datasets combining:
-
-- chemical composition results  
-- rolling temperatures  
-- lab test results  
-
-These datasets enabled more advanced exploratory and statistical analyses.
+The included notebook demonstrates this interaction pattern rather than advanced analysis.
 
 ---
 
 ## Results & Impact
 
-The implementation delivered clear benefits:
+The implementation delivered measurable benefits:
 
-- Significant efficiency gains by removing dependency on multiple spreadsheet versions  
-- Higher data reliability through enforced constraints at ingestion  
-- Elimination of performance bottlenecks caused by large Excel files  
-- Automated analysis workflows using Python notebooks  
-- Ability to run daily or historical analyses on demand  
-
-The validation point was clear:  
-when data could be ingested without errors and consumed at any time, the system was operating as intended.
-
----
-
-## Value for the Analyst
-
-From an analytical perspective, the model provides:
-
-- **Fluency:** less time preparing data, more time analyzing  
-- **Certainty:** a single, trusted version of the data  
-- **Reproducibility:** analyses can be repeated and extended without rebuilding pipelines  
-
-The analyst transitions from maintaining spreadsheets to working with a **stable analytical system**.
+- Elimination of spreadsheet dependency
+- Increased data reliability through enforced constraints
+- Removal of performance bottlenecks
+- Reproducible analytical workflows
+- Foundation for modeling and decision-support use cases documented in later study cases
 
 ---
 
 ## Lessons Learned
 
-When a consistent and reproducible data structure is defined upfront,  
-all downstream analysis becomes significantly simpler.
+When a consistent and well-defined data model is established upfront, downstream analytical complexity decreases dramatically.
 
-Analytical quality depends directly on:
-
-- data consistency  
-- clarity of the data model  
-- discipline at ingestion  
-
-Investing time in data modeling dramatically reduces future complexity.
+Data quality, reproducibility, and analytical velocity are direct consequences of disciplined data modeling.
 
 ---
 
 ## Closing
 
-This project represents a transition from spreadsheet-dependent analysis to a reproducible and scalable SQL-based analytics model.
+This study case represents a shift from file-based analysis to a **system-level analytical foundation**.
 
-More than a technical migration, it reflects a shift in mindset:  
-**treating data as a system rather than a collection of isolated files.**
+It is not an end in itself, but a prerequisite for all modeling and engineering decision tools built on top of it.
+
+> By fixing data semantics early, all downstream analyses become comparable, repeatable, and defensible.
 
 ---
-
-```mermaid
-flowchart LR
-  A[Excel / Google Sheets] --> B[Python pandas<br/>Extract and standardize]
-  B --> C[CSV exports<br/>staging-ready]
-  C --> D[(PostgreSQL)]
-  D --> E[Semantic layer<br/>Views for analysis]
-  E --> F[Python notebooks<br/>EDA and reporting]
-```
----
-
-## Status
-
-**Status:** Complete (v1)
-
-This case study focuses on the design and implementation of an analytics-ready SQL data model and its analytical consumption.
-Deeper analytical work (SPC, statistical analysis, customer-level insights) is intentionally covered in separate case studies.
